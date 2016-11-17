@@ -1,0 +1,320 @@
+<html>
+
+<head>
+
+<script>
+
+var name_index = ['normal','bug','poison','grass','water','fire',
+				  'ground','fighting','rock','fairy','electric','psychic',
+				  'ghost','dragon','ice','flying','dark','steel'];
+var color_idx  = ['A8A878','A8B821','A040A0','77C850','0000FF','FF0000',
+				  'E0C068','C03028','B8A038','EE99AC','F8D030','F85888',
+				  '705898','7038F8','98D8D8','A890F0','705848','B8B8D0'];
+var off_matrix = //... Strong Against
+    //... normal,bug,poison,grass,water,fire,ground,fighting,rock,fairy,electric,psychic,ghost,dragon,ice,flying,dark,steel
+       [
+	    [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%normal
+        [0     ,0  ,0     ,1    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,1      ,0    ,0     ,0  ,0     ,1   ,0], //%bug
+        [0     ,0  ,0     ,1    ,0    ,0   ,0     ,0       ,0   ,1    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%poison
+        [0     ,0  ,0     ,0    ,1    ,0   ,1     ,0       ,1   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%grass
+        [0     ,0  ,0     ,0    ,0    ,1   ,1     ,0       ,1   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%water
+        [0     ,1  ,0     ,1    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,1  ,0     ,0   ,1], //%fire
+        [0     ,0  ,1     ,0    ,0    ,1   ,0     ,0       ,1   ,0    ,1       ,0      ,0    ,0     ,0  ,0     ,0   ,1], //%ground
+        [1     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%fighting
+        [0     ,1  ,0     ,0    ,0    ,1   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,1  ,1     ,0   ,0], //%rock
+        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,1       ,0   ,0    ,0       ,0      ,0    ,1     ,0  ,0     ,1   ,0], //%fairy
+        [0     ,0  ,0     ,0    ,1    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,1     ,0   ,0], //%electric
+        [0     ,0  ,1     ,0    ,0    ,0   ,0     ,1       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%psychic
+        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,1      ,1    ,0     ,0  ,0     ,0   ,0], //%ghost
+        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,1     ,0  ,0     ,0   ,0], //%dragon
+        [0     ,0  ,0     ,1    ,0    ,0   ,1     ,0       ,0   ,0    ,0       ,0      ,0    ,1     ,0  ,1     ,0   ,0], //%ice
+        [0     ,1  ,0     ,1    ,0    ,0   ,0     ,1       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%flying
+        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,1      ,1    ,0     ,0  ,0     ,0   ,0], //%dark
+        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,1   ,1    ,0       ,0      ,0    ,0     ,1  ,0     ,0   ,0], //%steel
+    
+    ];
+
+	
+function getIndicies(arr){
+	var indexes = [], i;
+	for(i=0;i < arr.length;i++)
+		if (arr[i]==1)
+			indexes.push(i);
+		else if (arr[i]==2){
+			indexes.push(i);
+			indexes.push(i);
+		}
+	return indexes;
+}
+
+function getCol(arr, col) {
+	var column = [];
+	for (i=0;i<arr.length;i++){
+		column.push(arr[i][col]);
+	}
+	return column;
+}
+
+function dualType(arr1, arr2){
+	var added = [];
+	for (i=0;i<arr1.length;i++){
+		added[i] = arr1[i] + arr2[i];
+	}
+	return added;
+}
+
+function getStringNames(strong, weak) {
+	var strong_n = [];
+	var weak_n = [];
+	for (i=0;i<strong.length;i++)
+		strong_n[i] = name_index[strong[i]];
+	for (i=0;i<weak.length;i++)
+		weak_n[i] = name_index[weak[i]];
+	
+	return [strong_n, weak_n];
+}
+
+function myFunction() {
+	var type1 = document.querySelector('input[name=type1]:checked').value;
+	if (document.querySelector('input[name=type2]:checked')){
+		var type2 = document.querySelector('input[name=type2]:checked').value;
+	}else {
+		type2 = 18;
+	}
+	var temp;
+	
+	if (type2==18){
+		temp  = off_matrix[type1];
+		temp2 = getCol(off_matrix,type1);
+	}else{
+		temp  = dualType((off_matrix[type1]),(off_matrix[type2]));
+		temp2 = dualType(getCol(off_matrix,type1),getCol(off_matrix,type2));
+	}
+
+	types = getStringNames(getIndicies(temp),getIndicies(temp2));
+	
+	document.getElementById("question").style.display = "none";
+	document.getElementById("answers").style.display = "block";
+	formatter(types[0], types[1]);
+};
+
+function formatter(str, wk){
+	var toupe = document.getElementById("Strong_To");
+	for (i=0;i<str.length;i++) {
+		var board = document.createElement('div');
+		board.id = str[i];
+		board.innerText = str[i];
+		board.className = "ans";
+		toupe.appendChild(board);
+	}
+	var toupe = document.getElementById("Weak_To");
+	for (i=0;i<wk.length;i++) {
+		var board = document.createElement('div');
+		board.id = wk[i];
+		board.innerText = wk[i];
+		board.className = "ans";
+		toupe.appendChild(board);
+	}
+}
+
+function resetter() {
+	document.getElementById("Strong_To").innerHTML = "";
+	document.getElementById("Weak_To").innerHTML = "";
+	document.getElementById("question").style.display = "block";
+	document.getElementById("answers").style.display = "none";
+}
+</script>
+
+<style>
+#section1 {
+	float:left;
+	width: 48%;
+	text-align:center;
+	height: 80%;
+}
+#section2 {
+	float:right;
+	width: 49%;
+	text-align:center;
+	height: 80%;
+}
+
+#question {
+	display: block;
+}
+
+#answers {
+	display: none;
+}
+
+#water {
+	background-color: #0000FF;
+}
+#ice {
+	background-color: #98D8D8;
+}
+#flying {
+	background-color: #A890F0;
+}
+#poison {
+	background-color: #A040A0;
+}
+#ghost {
+	background-color: #705898;
+}
+#steel {
+	background-color: #B8B8D0;
+}
+#fire {
+	background-color: #FF0000;
+}
+#fighting {
+	background-color: #C03028;
+}
+#psychic {
+	background-color: #F85888;
+}
+#dragon {
+	background-color: #7038F8;
+}
+#dark {
+	background-color: #705848;
+}
+#fairy {
+	background-color: #EE99AC;
+}
+#grass {
+	background-color: #77C850;
+}
+#ground {
+	background-color: #E0C068;
+}
+#electric {
+	background-color: #F8D030;
+}
+#rock {
+	background-color: #B8A038;
+}
+#bug {
+	background-color: #A8B821;
+}
+#normal {
+	background-color: #A8A878;
+}
+
+.ans {
+	background-color: green;
+	text-align: center;
+	font-size: 0.4em;
+	width: 49%;
+	height: 9%;
+}
+
+input[type=radio] {
+	display:none;
+}
+
+input[type=radio] + label {
+	background-color: inherit;
+	text-align: center;
+	font-size: 2em;
+	border: solid 1px blue;
+	width: 49%;
+	display: inline-block;
+	height: 9%;
+}
+
+input[type=radio]:checked + label {
+	background-image: none;
+	background-color: blue;
+	color: #FFF;
+}
+
+.button {
+	background-color: green;
+	border: none;
+	color: white;
+	text-align: center;
+	font-size:5em;
+	width: 100%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	height: 19%;
+}
+
+</style>
+
+</head>
+
+<body>
+<div id="question">
+<div id="section1">
+TYPE 1
+<form id="type1_style">
+
+<input type="radio" id="normal" name="type1" value="0"><label for="normal"><div id="normal" style="width: 20%; height:100%; float:left;"></div>NORMAL</label>
+<input type="radio" id="bug" name="type1" value="1"><label for="bug"><div id="bug" style="width: 20%; height:100%; float:left;"></div>BUG</label>
+<input type="radio" id="poison" name="type1" value="2"><label for="poison"><div id="poison" style="width: 20%; height:100%; float:left;"></div>POISON</label>
+<input type="radio" id="grass" name="type1" value="3"><label for="grass"><div id="grass" style="width: 20%; height:100%; float:left;"></div>GRASS</label>
+<input type="radio" id="water" name="type1" value="4"><label for="water"><div id="water" style="width: 20%; height:100%; float:left;"></div>WATER</label>
+<input type="radio" id="fire" name="type1" value="5"><label for="fire"><div id="fire" style="width: 20%; height:100%; float:left;"></div>FIRE</label>
+<input type="radio" id="ground" name="type1" value="6"><label for="ground"><div id="ground" style="width: 20%; height:100%; float:left;"></div>GROUND</label>
+<input type="radio" id="fighting" name="type1" value="7"><label for="fighting"><div id="fighting" style="width: 20%; height:100%; float:left;"></div>FIGHTING</label>
+<input type="radio" id="rock" name="type1" value="8"><label for="rock"><div id="rock" style="width: 20%; height:100%; float:left;"></div>ROCK</label>
+<input type="radio" id="fairy" name="type1" value="9"><label for="fairy"><div id="fairy" style="width: 20%; height:100%; float:left;"></div>FAIRY</label>
+<input type="radio" id="electric" name="type1" value="10"><label for="electric"><div id="electric" style="width: 20%; height:100%; float:left;"></div>ELECTRIC</label>
+<input type="radio" id="psychic" name="type1" value="11"><label for="psychic"><div id="psychic" style="width: 20%; height:100%; float:left;"></div>PSYCHIC</label>
+<input type="radio" id="ghost" name="type1" value="12"><label for="ghost"><div id="ghost" style="width: 20%; height:100%; float:left;"></div>GHOST</label>
+<input type="radio" id="dragon" name="type1" value="13"><label for="dragon"><div id="dragon" style="width: 20%; height:100%; float:left;"></div>DRAGON</label>
+<input type="radio" id="ice" name="type1" value="14"><label for="ice"><div id="ice" style="width: 20%; height:100%; float:left;"></div>ICE</label>
+<input type="radio" id="flying" name="type1" value="15"><label for="flying"><div id="flying" style="width: 20%; height:100%; float:left;"></div>FLYING</label>
+<input type="radio" id="dark" name="type1" value="16"><label for="dark"><div id="dark" style="width: 20%; height:100%; float:left;"></div>DARK</label>
+<input type="radio" id="steel" name="type1" value="17"><label for="steel"><div id="steel" style="width: 20%; height:100%; float:left;"></div>STEEL</label>
+
+
+</form>
+</div>
+<div id="section2">
+TYPE 2
+<form id="type2_style">
+
+
+<input type="radio" id="normal2" name="type2" value="0"><label for="normal2"><div id="normal" style="width: 20%; height:100%; float:left;"></div>NORMAL</label>
+<input type="radio" id="bug2" name="type2" value="1"><label for="bug2"><div id="bug" style="width: 20%; height:100%; float:left;"></div>BUG</label>
+<input type="radio" id="poison2" name="type2" value="2"><label for="poison2"><div id="poison" style="width: 20%; height:100%; float:left;"></div>POISON</label>
+<input type="radio" id="grass2" name="type2" value="3"><label for="grass2"><div id="grass" style="width: 20%; height:100%; float:left;"></div>GRASS</label>
+<input type="radio" id="water2" name="type2" value="4"><label for="water2"><div id="water" style="width: 20%; height:100%; float:left;"></div>WATER</label>
+<input type="radio" id="fire2" name="type2" value="5"><label for="fire2"><div id="fire" style="width: 20%; height:100%; float:left;"></div>FIRE</label>
+<input type="radio" id="ground2" name="type2" value="6"><label for="ground2"><div id="ground" style="width: 20%; height:100%; float:left;"></div>GROUND</label>
+<input type="radio" id="fighting2" name="type2" value="7"><label for="fighting2"><div id="fighting" style="width: 20%; height:100%; float:left;"></div>FIGHTING</label>
+<input type="radio" id="rock2" name="type2" value="8"><label for="rock2"><div id="rock" style="width: 20%; height:100%; float:left;"></div>ROCK</label>
+<input type="radio" id="fairy2" name="type2" value="9"><label for="fairy2"><div id="fairy" style="width: 20%; height:100%; float:left;"></div>FAIRY</label>
+<input type="radio" id="electric2" name="type2" value="10"><label for="electric2"><div id="electric" style="width: 20%; height:100%; float:left;"></div>ELECTRIC</label>
+<input type="radio" id="psychic2" name="type2" value="11"><label for="psychic2"><div id="psychic" style="width: 20%; height:100%; float:left;"></div>PSYCHIC</label>
+<input type="radio" id="ghost2" name="type2" value="12"><label for="ghost2"><div id="ghost" style="width: 20%; height:100%; float:left;"></div>GHOST</label>
+<input type="radio" id="dragon2" name="type2" value="13"><label for="dragon2"><div id="dragon" style="width: 20%; height:100%; float:left;"></div>DRAGON</label>
+<input type="radio" id="ice2" name="type2" value="14"><label for="ice2"><div id="ice" style="width: 20%; height:100%; float:left;"></div>ICE</label>
+<input type="radio" id="flying2" name="type2" value="15"><label for="flying2"><div id="flying" style="width: 20%; height:100%; float:left;"></div>FLYING</label>
+<input type="radio" id="dark2" name="type2" value="16"><label for="dark2"><div id="dark" style="width: 20%; height:100%; float:left;"></div>DARK</label>
+<input type="radio" id="steel2" name="type2" value="17"><label for="steel2"><div id="steel" style="width: 20%; height:100%; float:left;"></div>STEEL</label>
+<input type="radio" id="none" name="type2" value="18"><label for="none">NONE</label>
+</form>
+</div>
+
+<input onclick="myFunction()" type="button" class="button" value="GO!">
+</div>
+<div id="answers">
+<div id="section1" style="font-size: 5em;">Strong to:<div id="Strong_To" style="color:white;"></div></div>
+<div id="section2" style="font-size: 5em;">Weak to:<div id="Weak_To" style="color:white;"></div></div>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick" />
+<input type="hidden" name="hosted_button_id" value="BXAY3VZUCGZGU" />
+<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate" />
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+</form>
+<input onclick="resetter()" type="button" class="button" value="ANOTHER!">
+</div>
+
+</body>
+
+</html>
