@@ -63,15 +63,50 @@ function dualType(arr1, arr2){
 	return added;
 }
 
+function moveType(type1,arr1,type2,arr2) {
+	var str   = getTheStringNames(arr1);
+	var str2  = getTheStringNames(arr2);
+	strFormatter(name_index[type1],str);
+	if (type1===type2)
+		strFormatter(name_index[type2].concat("2"),str2);
+	else
+		strFormatter(name_index[type2],str2);
+}
+
+function strFormatter(type, str) {
+	var toupe = document.getElementById("Strong_To");
+	var board = document.createElement('div');
+		board.id = type.concat("str_Type");
+		board.innerText = type;
+		board.style.width   = "48%";
+		board.style.height  = "100%";
+		board.style.backgroundColor = "black";
+		board.style.display = "inline-block";
+		board.style.float   = "left";
+		board.style.border = "solid 1px red";
+		board.style.fontSize = "0.5em";
+		toupe.appendChild(board);
+	var toupe = document.getElementById(type.concat("str_Type"));
+	for (i=0;i<str.length;i++) {
+		var board = document.createElement('div');
+		board.id = str[i];
+		board.style.width   = "100%";
+		board.innerText = str[i];
+		board.className = "ans";
+		board.style.fontSize = "0.8em";
+		toupe.appendChild(board);
+	}
+}
+
 function getStringNames(strong, weak) {
-	var strong_n = [];
-	var weak_n = [];
-	for (i=0;i<strong.length;i++)
-		strong_n[i] = name_index[strong[i]];
-	for (i=0;i<weak.length;i++)
-		weak_n[i] = name_index[weak[i]];
-	
-	return [strong_n, weak_n];
+	return [getTheStringNames(strong), getTheStringNames(weak)];
+}
+
+function getTheStringNames(arr) {
+	var arr_n = [];
+	for (i=0;i<arr.length;i++)
+		arr_n[i] = name_index[arr[i]];
+	return arr_n;
 }
 
 function myFunction() {
@@ -86,34 +121,49 @@ function myFunction() {
 	if (type2==18){
 		temp  = off_matrix[type1];
 		temp2 = getCol(off_matrix,type1);
+		types = getStringNames(getIndicies(temp),getIndicies(temp2));
+		formatter(types[0], types[1], 1);
 	}else{
-		temp  = dualType((off_matrix[type1]),(off_matrix[type2]));
+		temp  = moveType(type1,getIndicies(off_matrix[type1]),type2,getIndicies(off_matrix[type2]));
 		temp2 = dualType(getCol(off_matrix,type1),getCol(off_matrix,type2));
+		types = getTheStringNames(getIndicies(temp2));
+		formatter(types, types, 0);
 	}
 
-	types = getStringNames(getIndicies(temp),getIndicies(temp2));
+	
 	
 	document.getElementById("question").style.display = "none";
 	document.getElementById("answers").style.display = "block";
-	formatter(types[0], types[1]);
+	
 };
 
-function formatter(str, wk){
-	var toupe = document.getElementById("Strong_To");
-	for (i=0;i<str.length;i++) {
-		var board = document.createElement('div');
-		board.id = str[i];
-		board.innerText = str[i];
-		board.className = "ans";
-		toupe.appendChild(board);
-	}
-	var toupe = document.getElementById("Weak_To");
-	for (i=0;i<wk.length;i++) {
-		var board = document.createElement('div');
-		board.id = wk[i];
-		board.innerText = wk[i];
-		board.className = "ans";
-		toupe.appendChild(board);
+function formatter(str, wk, tab){
+	if (tab) {
+		var toupe = document.getElementById("Strong_To");
+		for (i=0;i<str.length;i++) {
+			var board = document.createElement('div');
+			board.id = str[i];
+			board.innerText = str[i];
+			board.className = "ans";
+			toupe.appendChild(board);
+		}
+		var toupe = document.getElementById("Weak_To");
+		for (i=0;i<wk.length;i++) {
+			var board = document.createElement('div');
+			board.id = wk[i];
+			board.innerText = wk[i];
+			board.className = "ans";
+			toupe.appendChild(board);
+		}
+	} else {
+		var toupe = document.getElementById("Weak_To");
+		for (i=0;i<wk.length;i++) {
+			var board = document.createElement('div');
+			board.id = wk[i];
+			board.innerText = wk[i];
+			board.className = "ans";
+			toupe.appendChild(board);
+		}
 	}
 }
 
@@ -122,6 +172,12 @@ function resetter() {
 	document.getElementById("Weak_To").innerHTML = "";
 	document.getElementById("question").style.display = "block";
 	document.getElementById("answers").style.display = "none";
+	var arr = document.getElementsByName('type1');
+	var ar2 = document.getElementsByName('type2');
+	for (i=0;i<arr.length;i++){
+		arr[i].checked = false;
+		ar2[i].checked = false;
+	}
 }
 </script>
 
@@ -146,7 +202,7 @@ function resetter() {
 #answers {
 	display: none;
 }
-
+/*http://bit.ly/2gkGkHX*/
 #water {
 	background-color: #0000FF;
 }
@@ -306,12 +362,15 @@ TYPE 2
 <div id="answers">
 <div id="section1" style="font-size: 5em;">Strong to:<div id="Strong_To" style="color:white;"></div></div>
 <div id="section2" style="font-size: 5em;">Weak to:<div id="Weak_To" style="color:white;"></div></div>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+
+<!--Donate Button-->
+<!--<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
 <input type="hidden" name="cmd" value="_s-xclick" />
 <input type="hidden" name="hosted_button_id" value="BXAY3VZUCGZGU" />
 <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate" />
 <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-</form>
+</form>-->
+<!--RESETTER-->
 <input onclick="resetter()" type="button" class="button" value="ANOTHER!">
 </div>
 
