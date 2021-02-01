@@ -1,378 +1,476 @@
+<!DOCTYPE html>
 <html>
+  <head>
+    <title>Meow Test</title>
+    <style>
+      table {
+        background-color: #fd6;
+      }
+      table, th, td, tr  {
+        border: 1px solid black;
+      }
+      tbody {
+        background-color: #fff;
+        height: 100%;
+        overflow: auto;
+      }
+      td {
+        width: 200px;
+      }
+      thead > tr, tbody{ display:block; }
+      #entries tr.clicked { background: #ccd; }
+      #entries tr.highlight { background: #eef; }
+    </style>
+    <script type="text/javascript">
 
-<head>
+      Array.prototype.rotate = (function() {
+        var unshift = Array.prototype.unshift,
+            splice = Array.prototype.splice;
 
-<script>
+        return function(count) {
+            var len = this.length >>> 0,
+                count = count >> 0;
 
-var name_index = ['normal','bug','poison','grass','water','fire',
-				  'ground','fighting','rock','fairy','electric','psychic',
-				  'ghost','dragon','ice','flying','dark','steel'];
-var color_idx  = ['A8A878','A8B821','A040A0','77C850','0000FF','FF0000',
-				  'E0C068','C03028','B8A038','EE99AC','F8D030','F85888',
-				  '705898','7038F8','98D8D8','A890F0','705848','B8B8D0'];
-var off_matrix = //... Strong Against
-    //... normal,bug,poison,grass,water,fire,ground,fighting,rock,fairy,electric,psychic,ghost,dragon,ice,flying,dark,steel
-       [
-	    [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%normal
-        [0     ,0  ,0     ,1    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,1      ,0    ,0     ,0  ,0     ,1   ,0], //%bug
-        [0     ,0  ,0     ,1    ,0    ,0   ,0     ,0       ,0   ,1    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%poison
-        [0     ,0  ,0     ,0    ,1    ,0   ,1     ,0       ,1   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%grass
-        [0     ,0  ,0     ,0    ,0    ,1   ,1     ,0       ,1   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%water
-        [0     ,1  ,0     ,1    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,1  ,0     ,0   ,1], //%fire
-        [0     ,0  ,1     ,0    ,0    ,1   ,0     ,0       ,1   ,0    ,1       ,0      ,0    ,0     ,0  ,0     ,0   ,1], //%ground
-        [1     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%fighting
-        [0     ,1  ,0     ,0    ,0    ,1   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,1  ,1     ,0   ,0], //%rock
-        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,1       ,0   ,0    ,0       ,0      ,0    ,1     ,0  ,0     ,1   ,0], //%fairy
-        [0     ,0  ,0     ,0    ,1    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,1     ,0   ,0], //%electric
-        [0     ,0  ,1     ,0    ,0    ,0   ,0     ,1       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%psychic
-        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,1      ,1    ,0     ,0  ,0     ,0   ,0], //%ghost
-        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,0      ,0    ,1     ,0  ,0     ,0   ,0], //%dragon
-        [0     ,0  ,0     ,1    ,0    ,0   ,1     ,0       ,0   ,0    ,0       ,0      ,0    ,1     ,0  ,1     ,0   ,0], //%ice
-        [0     ,1  ,0     ,1    ,0    ,0   ,0     ,1       ,0   ,0    ,0       ,0      ,0    ,0     ,0  ,0     ,0   ,0], //%flying
-        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,0   ,0    ,0       ,1      ,1    ,0     ,0  ,0     ,0   ,0], //%dark
-        [0     ,0  ,0     ,0    ,0    ,0   ,0     ,0       ,1   ,1    ,0       ,0      ,0    ,0     ,1  ,0     ,0   ,0], //%steel
-    
-    ];
+            unshift.apply(this, splice.call(this, count % len, len));
+            return this;
+        };
+      })();
 
-	
-function getIndicies(arr){
-	var indexes = [], i;
-	for(i=0;i < arr.length;i++)
-		if (arr[i]==1)
-			indexes.push(i);
-		else if (arr[i]==2){
-			indexes.push(i);
-			indexes.push(i);
-		}
-	return indexes;
-}
+      function starter(){
+        johnny_time = getParam('Johnny');
+        travis_time = getParam('Travis');
+        dave_time = getParam('Dave');
+        raul_time = getParam('Raul');
 
-function getCol(arr, col) {
-	var column = [];
-	for (i=0;i<arr.length;i++){
-		column.push(arr[i][col]);
-	}
-	return column;
-}
+        createCB();
+        createTable();
+        createLink();
 
-function dualType(arr1, arr2){
-	var added = [];
-	for (i=0;i<arr1.length;i++){
-		added[i] = arr1[i] + arr2[i];
-	}
-	return added;
-}
+        person_tracker = 1;
+        if (johnny_time != null){
+          person_tracker += 1;
+        }
+        if (travis_time != null){
+          person_tracker += 1;
+        }
+        if (dave_time != null){
+          person_tracker += 1;
+        }
+        if (raul_time != null){
+          person_tracker += 1;
+        }
+        opacity = 100/person_tracker;
 
-function moveType(type1,arr1,type2,arr2) {
-	var str   = getTheStringNames(arr1);
-	var str2  = getTheStringNames(arr2);
-	strFormatter(name_index[type1],str);
-	if (type1===type2)
-		strFormatter(name_index[type2].concat("2"),str2);
-	else
-		strFormatter(name_index[type2],str2);
-}
-
-function strFormatter(type, str) {
-	var toupe = document.getElementById("Strong_To");
-	var board = document.createElement('div');
-		board.id = type.concat("str_Type");
-		board.innerText = type;
-		board.style.width   = "48%";
-		board.style.height  = "100%";
-		board.style.backgroundColor = "black";
-		board.style.display = "inline-block";
-		board.style.float   = "left";
-		board.style.fontSize = "0.5em";
-		toupe.appendChild(board);
-	var toupe = document.getElementById(type.concat("str_Type"));
-	for (i=0;i<str.length;i++) {
-		var board = document.createElement('div');
-		board.id = str[i];
-		board.style.width   = "100%";
-		board.innerText = str[i];
-		board.className = "ans";
-		board.style.fontSize = "0.8em";
-		toupe.appendChild(board);
-	}
-}
-
-function getStringNames(strong, weak) {
-	return [getTheStringNames(strong), getTheStringNames(weak)];
-}
-
-function getTheStringNames(arr) {
-	var arr_n = [];
-	for (i=0;i<arr.length;i++)
-		arr_n[i] = name_index[arr[i]];
-	return arr_n;
-}
-
-function myFunction() {
-	var type1 = document.querySelector('input[name=type1]:checked').value;
-	if (document.querySelector('input[name=type2]:checked')){
-		var type2 = document.querySelector('input[name=type2]:checked').value;
-	}else {
-		type2 = 18;
-	}
-	var temp;
-	
-	if (type2==18){
-		temp  = off_matrix[type1];
-		temp2 = getCol(off_matrix,type1);
-		types = getStringNames(getIndicies(temp),getIndicies(temp2));
-		formatter(types[0], types[1], 1);
-	}else{
-		temp  = moveType(type1,getIndicies(off_matrix[type1]),type2,getIndicies(off_matrix[type2]));
-		temp2 = dualType(getCol(off_matrix,type1),getCol(off_matrix,type2));
-		types = getTheStringNames(getIndicies(temp2));
-		formatter(types, types, 0);
-	}
-
-	
-	
-	document.getElementById("question").style.display = "none";
-	document.getElementById("answers").style.display = "block";
-	
-};
-
-function formatter(str, wk, tab){
-	if (tab) {
-		var toupe = document.getElementById("Strong_To");
-		for (i=0;i<str.length;i++) {
-			var board = document.createElement('div');
-			board.id = str[i];
-			board.innerText = str[i];
-			board.className = "ans";
-			toupe.appendChild(board);
-		}
-		var toupe = document.getElementById("Weak_To");
-		for (i=0;i<wk.length;i++) {
-			var board = document.createElement('div');
-			board.id = wk[i];
-			board.innerText = wk[i];
-			board.className = "ans";
-			toupe.appendChild(board);
-		}
-	} else {
-		var toupe = document.getElementById("Weak_To");
-		for (i=0;i<wk.length;i++) {
-			var board = document.createElement('div');
-			board.id = wk[i];
-			board.innerText = wk[i];
-			board.className = "ans";
-			toupe.appendChild(board);
-		}
-	}
-}
-
-function resetter() {
-	document.getElementById("Strong_To").innerHTML = "";
-	document.getElementById("Weak_To").innerHTML = "";
-	document.getElementById("question").style.display = "block";
-	document.getElementById("answers").style.display = "none";
-	var arr = document.getElementsByName('type1');
-	var ar2 = document.getElementsByName('type2');
-	for (i=0;i<arr.length;i++){
-		arr[i].checked = false;
-		ar2[i].checked = false;
-	}
-}
-</script>
-
-<style>
-#section1 {
-	float:left;
-	width: 48%;
-	text-align:center;
-	height: 80%;
-}
-#section2 {
-	float:right;
-	width: 49%;
-	text-align:center;
-	height: 80%;
-}
-
-#question {
-	display: block;
-}
-
-#answers {
-	display: none;
-}
-/*http://bit.ly/2gkGkHX*/
-#water {
-	background-color: #0000FF;
-}
-#ice {
-	background-color: #98D8D8;
-}
-#flying {
-	background-color: #A890F0;
-}
-#poison {
-	background-color: #A040A0;
-}
-#ghost {
-	background-color: #705898;
-}
-#steel {
-	background-color: #B8B8D0;
-}
-#fire {
-	background-color: #FF0000;
-}
-#fighting {
-	background-color: #C03028;
-}
-#psychic {
-	background-color: #F85888;
-}
-#dragon {
-	background-color: #7038F8;
-}
-#dark {
-	background-color: #705848;
-}
-#fairy {
-	background-color: #EE99AC;
-}
-#grass {
-	background-color: #77C850;
-}
-#ground {
-	background-color: #E0C068;
-}
-#electric {
-	background-color: #F8D030;
-}
-#rock {
-	background-color: #B8A038;
-}
-#bug {
-	background-color: #A8B821;
-}
-#normal {
-	background-color: #A8A878;
-}
-
-.ans {
-	background-color: green;
-	text-align: center;
-	font-size: 0.4em;
-	width: 49%;
-	height: 9%;
-}
-
-input[type=radio] {
-	display:none;
-}
-
-input[type=radio] + label {
-	background-color: inherit;
-	text-align: center;
-	font-size: 2em;
-	border: solid 1px blue;
-	width: 49%;
-	display: inline-block;
-	height: 9%;
-}
-
-input[type=radio]:checked + label {
-	background-image: none;
-	background-color: blue;
-	color: #FFF;
-}
-
-.button {
-	background-color: green;
-	border: none;
-	color: white;
-	text-align: center;
-	font-size:5em;
-	width: 100%;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	height: 19%;
-}
-
-</style>
-
-</head>
-
-<body>
-<div id="question">
-<div id="section1">
-TYPE 1
-<form id="type1_style">
-
-<input type="radio" id="normal" name="type1" value="0"><label for="normal"><div id="normal" style="width: 20%; height:100%; float:left;"></div>NORMAL</label>
-<input type="radio" id="bug" name="type1" value="1"><label for="bug"><div id="bug" style="width: 20%; height:100%; float:left;"></div>BUG</label>
-<input type="radio" id="poison" name="type1" value="2"><label for="poison"><div id="poison" style="width: 20%; height:100%; float:left;"></div>POISON</label>
-<input type="radio" id="grass" name="type1" value="3"><label for="grass"><div id="grass" style="width: 20%; height:100%; float:left;"></div>GRASS</label>
-<input type="radio" id="water" name="type1" value="4"><label for="water"><div id="water" style="width: 20%; height:100%; float:left;"></div>WATER</label>
-<input type="radio" id="fire" name="type1" value="5"><label for="fire"><div id="fire" style="width: 20%; height:100%; float:left;"></div>FIRE</label>
-<input type="radio" id="ground" name="type1" value="6"><label for="ground"><div id="ground" style="width: 20%; height:100%; float:left;"></div>GROUND</label>
-<input type="radio" id="fighting" name="type1" value="7"><label for="fighting"><div id="fighting" style="width: 20%; height:100%; float:left;"></div>FIGHTING</label>
-<input type="radio" id="rock" name="type1" value="8"><label for="rock"><div id="rock" style="width: 20%; height:100%; float:left;"></div>ROCK</label>
-<input type="radio" id="fairy" name="type1" value="9"><label for="fairy"><div id="fairy" style="width: 20%; height:100%; float:left;"></div>FAIRY</label>
-<input type="radio" id="electric" name="type1" value="10"><label for="electric"><div id="electric" style="width: 20%; height:100%; float:left;"></div>ELECTRIC</label>
-<input type="radio" id="psychic" name="type1" value="11"><label for="psychic"><div id="psychic" style="width: 20%; height:100%; float:left;"></div>PSYCHIC</label>
-<input type="radio" id="ghost" name="type1" value="12"><label for="ghost"><div id="ghost" style="width: 20%; height:100%; float:left;"></div>GHOST</label>
-<input type="radio" id="dragon" name="type1" value="13"><label for="dragon"><div id="dragon" style="width: 20%; height:100%; float:left;"></div>DRAGON</label>
-<input type="radio" id="ice" name="type1" value="14"><label for="ice"><div id="ice" style="width: 20%; height:100%; float:left;"></div>ICE</label>
-<input type="radio" id="flying" name="type1" value="15"><label for="flying"><div id="flying" style="width: 20%; height:100%; float:left;"></div>FLYING</label>
-<input type="radio" id="dark" name="type1" value="16"><label for="dark"><div id="dark" style="width: 20%; height:100%; float:left;"></div>DARK</label>
-<input type="radio" id="steel" name="type1" value="17"><label for="steel"><div id="steel" style="width: 20%; height:100%; float:left;"></div>STEEL</label>
+        if (johnny_time != null){
+          convertToCal(correctTiming(johnny_time));
+        }
+        if (travis_time != null){
+          convertToCal(correctTiming(travis_time));
+        }
+        if (dave_time != null){
+          convertToCal(correctTiming(dave_time));
+        }
+        if (raul_time != null){
+          convertToCal(correctTiming(raul_time));
+        }
 
 
-</form>
-</div>
-<div id="section2">
-TYPE 2
-<form id="type2_style">
+      }
+
+      var days = [' ','Sun','Mon','Tues','Wed','Thur','Fri','Sat'];
+      var users = ['Johnny','Dave','Travis','Raul'];
+      var offset = new Date().getTimezoneOffset();
+      var cor_offset = (offset/60)*-1;
+      var page = window.location.href;
+
+      var MM_Code = [];
+
+      var u_num;
+      var m_num;
+      var t_num;
+      var w_num;
+      var h_num;
+      var f_num;
+      var s_num;
+
+      var u = [];
+      var m = [];
+      var t = [];
+      var w = [];
+      var h = [];
+      var f = [];
+      var s = [];
+
+      for (var j = 0; j < 24; j++){
+        u[j] = '0';
+        m[j] = '0';
+        t[j] = '0';
+        w[j] = '0';
+        h[j] = '0';
+        f[j] = '0';
+        s[j] = '0';
+      }
+
+      function correctTiming(list) {
+        results = list.split("_");
+        var combo = '';
+
+        for (var i = 0; i < (results.length - 1); i++){
+          temp = parseInt(results[i],36);
+          tem = temp.toString(2);
+          o = tem.split("");
+          if (o.length < 24){
+            for (var k = o.length; k < 24; k++){
+              o.unshift('0');
+            }
+          }
+          if (i == 0){
+          combo = combo + o;
+          }else{
+            combo = combo + ',' + o;
+          }
+        }
+        var dingo = combo.split(',');
+        var moo = dingo.rotate((cor_offset - results[results.length - 1])*-1);
+        var ans = ['','','','','','',''];
+
+        for (var op = 0; op < moo.length; op++){
+          if (op < 24){
+            ans[0] = ans[0] + moo[op];
+          } else if (op < 48){
+            ans[1] = ans[1] + moo[op];
+          } else if (op < 72) {
+            ans[2] = ans[2] + moo[op];
+          } else if (op < 96){
+            ans[3] = ans[3] + moo[op];
+          } else if (op < 120) {
+            ans[4] = ans[4] + moo[op];
+          } else if (op < 144){
+            ans[5] = ans[5] + moo[op];
+          } else if (op < 168) {
+            ans[6] = ans[6] + moo[op];
+          }
+        }
+        console.log(ans[6].length);
+
+        return ans;
+        //var dingo = combo.join("");
+        //console.log(dingo);
+      }
+
+      function convertToCal(results){
+        for (var i = 0; i < (results.length); i++){
+          o = results[i];
+          var x = document.getElementsByTagName("td");
+          var ctr = 0;
+          for (var j = 0; j < x.length; j++) {
+            if (j%8 == (i+1) && j > 7){
+              if(o[ctr] == 1) {
+                var fruit = x[j].style.backgroundColor;
+                switch(fruit){
+                  case "palegreen":
+                    x[j].style.backgroundColor = "mediumspringgreen";
+                    break;
+                  case "mediumspringgreen":
+                    x[j].style.backgroundColor = "mediumseagreen";
+                    break;
+                  case "mediumseagreen":
+                    x[j].style.backgroundColor = "darkgreen";
+                    break;
+                  default:
+                    x[j].style.backgroundColor = "palegreen";
+                }
+                var fruit = x[j].style.backgroundColor;
+              }
+              ctr += 1;
+            }
+          }
+        }
+      }
+
+      function createCB(){
+        createInstructions();
+        var body = document.body;
+        for ( var i = 0; i < users.length; i++){
+          var x = document.createElement("input");
+          x.type = "checkbox";
+          x.name = users[i];
+          x.value = "value";
+          x.id = "users" + i;
+          x.style = "outline: 1px solid #1e5180";
+          x.addEventListener("click",setUpArray);
 
 
-<input type="radio" id="normal2" name="type2" value="0"><label for="normal2"><div id="normal" style="width: 20%; height:100%; float:left;"></div>NORMAL</label>
-<input type="radio" id="bug2" name="type2" value="1"><label for="bug2"><div id="bug" style="width: 20%; height:100%; float:left;"></div>BUG</label>
-<input type="radio" id="poison2" name="type2" value="2"><label for="poison2"><div id="poison" style="width: 20%; height:100%; float:left;"></div>POISON</label>
-<input type="radio" id="grass2" name="type2" value="3"><label for="grass2"><div id="grass" style="width: 20%; height:100%; float:left;"></div>GRASS</label>
-<input type="radio" id="water2" name="type2" value="4"><label for="water2"><div id="water" style="width: 20%; height:100%; float:left;"></div>WATER</label>
-<input type="radio" id="fire2" name="type2" value="5"><label for="fire2"><div id="fire" style="width: 20%; height:100%; float:left;"></div>FIRE</label>
-<input type="radio" id="ground2" name="type2" value="6"><label for="ground2"><div id="ground" style="width: 20%; height:100%; float:left;"></div>GROUND</label>
-<input type="radio" id="fighting2" name="type2" value="7"><label for="fighting2"><div id="fighting" style="width: 20%; height:100%; float:left;"></div>FIGHTING</label>
-<input type="radio" id="rock2" name="type2" value="8"><label for="rock2"><div id="rock" style="width: 20%; height:100%; float:left;"></div>ROCK</label>
-<input type="radio" id="fairy2" name="type2" value="9"><label for="fairy2"><div id="fairy" style="width: 20%; height:100%; float:left;"></div>FAIRY</label>
-<input type="radio" id="electric2" name="type2" value="10"><label for="electric2"><div id="electric" style="width: 20%; height:100%; float:left;"></div>ELECTRIC</label>
-<input type="radio" id="psychic2" name="type2" value="11"><label for="psychic2"><div id="psychic" style="width: 20%; height:100%; float:left;"></div>PSYCHIC</label>
-<input type="radio" id="ghost2" name="type2" value="12"><label for="ghost2"><div id="ghost" style="width: 20%; height:100%; float:left;"></div>GHOST</label>
-<input type="radio" id="dragon2" name="type2" value="13"><label for="dragon2"><div id="dragon" style="width: 20%; height:100%; float:left;"></div>DRAGON</label>
-<input type="radio" id="ice2" name="type2" value="14"><label for="ice2"><div id="ice" style="width: 20%; height:100%; float:left;"></div>ICE</label>
-<input type="radio" id="flying2" name="type2" value="15"><label for="flying2"><div id="flying" style="width: 20%; height:100%; float:left;"></div>FLYING</label>
-<input type="radio" id="dark2" name="type2" value="16"><label for="dark2"><div id="dark" style="width: 20%; height:100%; float:left;"></div>DARK</label>
-<input type="radio" id="steel2" name="type2" value="17"><label for="steel2"><div id="steel" style="width: 20%; height:100%; float:left;"></div>STEEL</label>
-<input type="radio" id="none" name="type2" value="18"><label for="none">NONE</label>
-</form>
-</div>
+          var label = document.createElement('label');
+          label.htmlFor = "users";
+          label.appendChild(document.createTextNode(users[i]));
+          label.style = "font-size: 20px";
 
-<input onclick="myFunction()" type="button" class="button" value="GO!">
-</div>
-<div id="answers">
-<div id="section1" style="font-size: 5em;">Strong to:<div id="Strong_To" style="color:white;"></div></div>
-<div id="section2" style="font-size: 5em;">Weak to:<div id="Weak_To" style="color:white;"></div></div>
+          body.appendChild(x);
+          body.appendChild(label);
+        }
 
-<!--Donate Button-->
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick" />
-<input type="hidden" name="hosted_button_id" value="BXAY3VZUCGZGU" />
-<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate" />
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-</form>
-<!--RESETTER-->
-<input onclick="resetter()" type="button" class="button" value="ANOTHER!">
-</div>
+        colorTable();
+      }
+      function colorTable(){
+        var body = document.body;
+        var colTab = document.createElement("table");
+        var colRow = colTab.insertRow();
+        var firstC = colRow.insertCell();
+        firstC.innerHTML = "1 Person";
+        var twoC   = colRow.insertCell();
+        twoC.innerHTML = "2 People";
+        var threeC = colRow.insertCell();
+        threeC.innerHTML = "3 People";
+        var fourC  = colRow.insertCell();
+        fourC.innerHTML = "4 People";
+        firstC.style.backgroundColor = "palegreen";
+        twoC.style.backgroundColor = "mediumseagreen";
+        threeC.style.backgroundColor = "mediumspringgreen";
+        fourC.style.backgroundColor = "darkgreen";
+        colTab.style.width = "50%";
+        colTab.style.float = "right";
+        body.appendChild(colTab);
+      }
 
-</body>
+      function setUpArray(){
+        for ( var i = 0; i < users.length; i++){
+          var list = document.getElementById("users" + i);
+          if (list.name != this.name){
+            list.checked = false;
+          }
+        }
+        main_user = this.name;
+      }
 
+      times = ["12 AM","1 AM","2 AM","3 AM","4 AM","5 AM","6 AM","7 AM","8 AM","9 AM","10 AM","11 AM",
+               "12 PM","1 PM","2 PM","3 PM","4 PM","5 PM","6 PM","7 PM","8 PM","9 PM","10 PM","11 PM"];
+
+      function createTable(){
+        var body = document.body;
+        var tbl = document.createElement('table');
+        var tbdy = document.createElement('tbody');
+
+        for (var i = 0; i < 25; i++){
+          var tr = tbl.insertRow();
+          if ( i%2 == 1 ){
+            tr.style.backgroundColor = "rgba(211,211,211,100)";
+          } else {
+            tr.style.backgroundColor = "white";
+          }
+          for (var j = 0; j < days.length; j++){
+            var td = tr.insertCell();
+            if (i == 0){
+              td.appendChild(document.createTextNode(days[j]));
+            } else if ( j == 0 ){
+              td.appendChild(document.createTextNode(times[i-1]));
+              td.style.textAlign = "right";//String(i-1)));
+            } else {
+              td.appendChild(document.createTextNode(""));
+            }
+            if ( i > 0 && j > 0){
+              td.addEventListener("click", clicked);
+              td.setAttribute("selected","");
+            }
+            td.style.fontSize = 'x-large';
+          }
+        }
+        body.appendChild(tbl);
+      }
+
+
+      function clicked() {
+        var flag = this.getAttribute("selected");
+        if (!flag){
+          this.setAttribute("selected","true");
+          var fruit = this.style.backgroundColor;
+          switch(fruit){
+            case "palegreen":
+              this.style.backgroundColor = "mediumspringgreen";
+              break;
+            case "mediumspringgreen":
+              this.style.backgroundColor = "mediumseagreen";
+              break;
+            case "mediumseagreen":
+              this.style.backgroundColor = "darkgreen";
+              break;
+            default:
+              this.style.backgroundColor = "palegreen";
+          }
+          switch (this.cellIndex){
+            case 1:
+              u[this.parentNode.rowIndex - 1] = '1';
+              break;
+            case 2:
+              m[this.parentNode.rowIndex - 1] = '1';
+              break;
+            case 3:
+              t[this.parentNode.rowIndex - 1] = '1';
+              break;
+            case 4:
+              w[this.parentNode.rowIndex - 1] = '1';
+              break;
+            case 5:
+              h[this.parentNode.rowIndex - 1] = '1';
+              break;
+            case 6:
+              f[this.parentNode.rowIndex - 1] = '1';
+              break;
+            case 7:
+              s[this.parentNode.rowIndex - 1] = '1';
+              break;
+          }
+        } else {
+          this.setAttribute("selected","");
+          var fruit = this.style.backgroundColor;
+          switch(fruit){
+            case "darkgreen":
+              this.style.backgroundColor = "mediumseagreen";
+              break;
+            case "mediumseagreen":
+              this.style.backgroundColor = "mediumspringgreen";
+              break;
+            case "mediumspringgreen":
+              this.style.backgroundColor = "palegreen";
+              break;
+            default:
+              if (this.parentNode.rowIndex%2 == 0){
+                this.style.backgroundColor = "white";
+              } else {
+                this.style.backgroundColor = "lightgray";
+              }
+          }
+
+          switch (this.cellIndex){
+            case 1:
+              u[this.parentNode.rowIndex - 1] = '0';
+              break;
+            case 2:
+              m[this.parentNode.rowIndex - 1] = '0';
+              break;
+            case 3:
+              t[this.parentNode.rowIndex - 1] = '0';
+              break;
+            case 4:
+              w[this.parentNode.rowIndex - 1] = '0';
+              break;
+            case 5:
+              h[this.parentNode.rowIndex - 1] = '0';
+              break;
+            case 6:
+              f[this.parentNode.rowIndex - 1] = '0';
+              break;
+            case 7:
+              s[this.parentNode.rowIndex - 1] = '0';
+              break;
+          }
+        }
+        convert36();
+        alterLink();
+      }
+
+      function convert36(){
+        // Here calculate
+        var temp;
+        temp = parseInt(u.join(""),2);
+        u_num = temp.toString(36);
+
+        temp = parseInt(m.join(""),2);
+        m_num = temp.toString(36);
+
+        temp = parseInt(t.join(""),2);
+        t_num = temp.toString(36);
+
+        temp = parseInt(w.join(""),2);
+        w_num = temp.toString(36);
+
+        temp = parseInt(h.join(""),2);
+        h_num = temp.toString(36);
+
+        temp = parseInt(f.join(""),2);
+        f_num = temp.toString(36);
+
+        temp = parseInt(s.join(""),2);
+        s_num = temp.toString(36);
+
+        MM_Code = [u_num, '_', m_num, '_', t_num, '_', w_num, '_', h_num, '_', f_num, '_', s_num, '_', cor_offset];
+
+      }
+
+      function alterLink(){
+        var test = page.includes('?');
+        var q = '';
+        if (test) {
+          q = '';
+        } else {
+          q = '?';
+        }
+        var ender = ''
+        if (johnny_time != null && travis_time != null && dave_time != null && raul_time != null){
+          ender = ''
+        } else {
+          ender = '&';
+        }
+        if (main_user == "Johnny" && johnny_time == null) {
+          var temp = page + q + main_user + '=' + MM_Code.join("") + ender;
+          var yE = document.getElementById("changeLink");
+          yE.setAttribute('href', temp);
+        }
+        else if (main_user == "Travis" && travis_time == null) {
+          var temp = page + q + main_user + '=' + MM_Code.join("") + ender;
+          var yE = document.getElementById("changeLink");
+          yE.setAttribute('href', temp);
+        }
+        else if (main_user == "Dave" && dave_time == null) {
+          var temp = page + q + main_user + '=' + MM_Code.join("") + ender;
+          var yE = document.getElementById("changeLink");
+          yE.setAttribute('href', temp);
+        }
+        else if (main_user == "Raul" && raul_time == null) {
+          var temp = page + q + main_user + '=' + MM_Code.join("") + ender;
+          var yE = document.getElementById("changeLink");
+          yE.setAttribute('href', temp);
+        }
+      }
+
+
+      function createLink(){
+        var body = document.body;
+        var a = document.createElement('a');
+        var linkText = document.createTextNode("Click Here When Done");
+        a.appendChild(linkText);
+        a.id = "changeLink";
+        a.title = "Click Here";
+        a.href = page;
+        body.appendChild(a);
+        document.getElementById("changeLink").style.fontSize = "x-large";
+      }
+
+      function createInstructions(){
+        var body = document.body;
+        var button = document.createElement('button');
+        button.innerHTML = "Instructions";
+        button.onclick = function theInst(){
+          alert('1) Select Your Name\n2) Select Your Availability\n3) Press Click Here When Done (under the table)\n4) Copy The Website Link and Send It to Someone Else')
+        };
+        body.appendChild(button);
+      }
+
+
+      //Added function
+      function getParam(name, url = window.location.href) {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      }
+
+    </script>
+  </head>
+
+  <body onload=starter()>
+
+  </body>
 </html>
