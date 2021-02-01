@@ -46,20 +46,6 @@
         createTable();
         createLink();
 
-        person_tracker = 1;
-        if (johnny_time != null){
-          person_tracker += 1;
-        }
-        if (travis_time != null){
-          person_tracker += 1;
-        }
-        if (dave_time != null){
-          person_tracker += 1;
-        }
-        if (raul_time != null){
-          person_tracker += 1;
-        }
-        opacity = 100/person_tracker;
 
         if (johnny_time != null){
           convertToCal(correctTiming(johnny_time));
@@ -130,10 +116,14 @@
             combo = combo + ',' + o;
           }
         }
+        var sup_corrector = (cor_offset - results[results.length - 1])*-1;
         var dingo = combo.split(',');
-        var moo = dingo.rotate((cor_offset - results[results.length - 1])*-1);
+        if (sup_corrector != 0){
+          var moo = dingo.rotate(sup_corrector);
+        } else {
+          var moo = dingo;
+        }
         var ans = ['','','','','','',''];
-
         for (var op = 0; op < moo.length; op++){
           if (op < 24){
             ans[0] = ans[0] + moo[op];
@@ -151,7 +141,6 @@
             ans[6] = ans[6] + moo[op];
           }
         }
-        console.log(ans[6].length);
 
         return ans;
         //var dingo = combo.join("");
@@ -161,7 +150,8 @@
       function convertToCal(results){
         for (var i = 0; i < (results.length); i++){
           o = results[i];
-          var x = document.getElementsByTagName("td");
+          //var x = document.getElementsByTagName("td");
+          var x = document.getElementsByClassName("main_Table");
           var ctr = 0;
           for (var j = 0; j < x.length; j++) {
             if (j%8 == (i+1) && j > 7){
@@ -180,7 +170,6 @@
                   default:
                     x[j].style.backgroundColor = "palegreen";
                 }
-                var fruit = x[j].style.backgroundColor;
               }
               ctr += 1;
             }
@@ -275,6 +264,7 @@
               td.setAttribute("selected","");
             }
             td.style.fontSize = 'x-large';
+            td.className = "main_Table";
           }
         }
         tbl.style.float = "right";
